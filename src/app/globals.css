@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Neutral ramp (oklch) — ink-0 darkest bg → ink-4 brightest text */
+  --ink-0: oklch(0.16 0.012 265);
+  --ink-1: oklch(0.21 0.014 265);
+  --ink-2: oklch(0.30 0.016 265);
+  --ink-3: oklch(0.62 0.018 265);
+  --ink-4: oklch(0.93 0.01 265);
+
+  /* One accent + semantic colours */
+  --accent: oklch(0.72 0.16 195);
+  --ok: oklch(0.74 0.16 150);
+  --warn: oklch(0.80 0.15 85);
+  --danger: oklch(0.66 0.20 25);
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  --panel-bg: oklch(0.21 0.014 265 / 0.55);
+  --panel-border: oklch(0.45 0.02 265 / 0.35);
+}
+
+html,
+body {
+  background: var(--ink-0);
+  color: var(--ink-4);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(900px 600px at 12% -5%, oklch(0.30 0.05 230 / 0.25), transparent 60%),
+    radial-gradient(800px 600px at 95% 0%, oklch(0.30 0.06 320 / 0.18), transparent 55%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Glassmorphism panel */
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thin scrollbars */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--ink-2);
+  border-radius: 8px;
+}
