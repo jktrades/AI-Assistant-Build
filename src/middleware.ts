@@ -8,7 +8,7 @@ function isPublic(pathname: string): boolean {
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (isPublic(pathname)) return NextResponse.next();
 
@@ -19,7 +19,7 @@ export function middleware(req: NextRequest) {
   }
 
   const cookie = req.cookies.get(sessionCookie.name)?.value;
-  if (verifySessionValue(cookie)) return NextResponse.next();
+  if (await verifySessionValue(cookie)) return NextResponse.next();
 
   // API routes get a 401; page routes redirect to /login.
   if (pathname.startsWith("/api/")) {

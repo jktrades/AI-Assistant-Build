@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
@@ -11,36 +10,60 @@ function secret(): string {
   return s;
 }
 
+const encoder = new TextEncoder();
+
+function bufToHex(buf: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+// HMAC-SHA256 via the Web Crypto API so this runs on the Edge runtime
+// (Next.js middleware) as well as Node — Node's `crypto` module is unavailable
+// on Edge.
+async function hmac(payload: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret()),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
+  return bufToHex(sig);
+}
+
+// Constant-time string comparison (no Node `crypto.timingSafeEqual` on Edge).
+export function constantTimeEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
 // HMAC-signed cookie value: `${expiry}.${hmac(expiry)}`. Stateless — no session
 // store needed for a single-user dashboard.
-export function signSession(): string {
+export async function signSession(): Promise<string> {
   const expiry = Date.now() + MAX_AGE * 1000;
   const payload = String(expiry);
-  const sig = crypto.createHmac("sha256", secret()).update(payload).digest("hex");
+  const sig = await hmac(payload);
   return `${payload}.${sig}`;
 }
 
-export function verifySessionValue(value: string | undefined | null): boolean {
+export async function verifySessionValue(
+  value: string | undefined | null
+): Promise<boolean> {
   if (!value) return false;
   const dot = value.lastIndexOf(".");
   if (dot < 0) return false;
   const payload = value.slice(0, dot);
   const sig = value.slice(dot + 1);
-  const expected = crypto
-    .createHmac("sha256", secret())
-    .update(payload)
-    .digest("hex");
-  if (sig.length !== expected.length) return false;
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return false;
+  const expected = await hmac(payload);
+  if (!constantTimeEquals(sig, expected)) return false;
   const expiry = Number(payload);
   return Number.isFinite(expiry) && expiry > Date.now();
-}
-
-export function constantTimeEquals(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return crypto.timingSafeEqual(ab, bb);
 }
 
 export const sessionCookie = {
