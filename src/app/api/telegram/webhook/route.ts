@@ -3,6 +3,7 @@ import { runCapturePipeline } from "@/lib/pipeline";
 import { openai } from "@/lib/llm";
 import { supabaseAdmin } from "@/lib/supabase";
 import { USER_ID } from "@/lib/config";
+import { constantTimeEquals } from "@/lib/auth";
 import {
   sendMessage,
   urgencyKeyboard,
@@ -14,11 +15,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 function authorized(req: NextRequest): boolean {
-  const secret = req.headers.get("x-telegram-bot-api-secret-token");
-  return Boolean(
-    process.env.TELEGRAM_WEBHOOK_SECRET &&
-      secret === process.env.TELEGRAM_WEBHOOK_SECRET
-  );
+  // Trim both sides: secrets pasted into Vercel/host env vars frequently pick
+  // up a trailing newline or spaces, which breaks an exact `===` even when the
+  // value matches the secret_token registered with Telegram.
+  const expected = (process.env.TELEGRAM_WEBHOOK_SECRET || "").trim();
+  const provided = (req.headers.get("x-telegram-bot-api-secret-token") || "").trim();
+  if (!expected || !provided) return false;
+  return constantTimeEquals(provided, expected);
 }
 
 function isMe(fromId: number | undefined): boolean {

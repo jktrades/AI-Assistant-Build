@@ -32,6 +32,11 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Run on everything except Next internals and static assets.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Run on everything except Next internals, static assets, and the Telegram
+  // webhook. The webhook authenticates itself via the secret_token header, so
+  // the auth-gate middleware must never run on it (it would otherwise reject
+  // Telegram's cookieless request).
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/telegram|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
