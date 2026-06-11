@@ -42,7 +42,7 @@ export function TopRail() {
     <header className="panel sticky top-3 z-20 mx-auto mb-4 flex items-center justify-between px-4 py-2.5">
       <div className="flex items-center gap-2">
         <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-        <span className="font-semibold tracking-tight">Personal OS</span>
+        <span className="font-semibold tracking-tight">JK OS</span>
       </div>
 
       <nav className="hidden md:flex items-center gap-1">

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Personal OS",
+  title: "JK OS",
   description: "Your AI-native operating system.",
 };
 

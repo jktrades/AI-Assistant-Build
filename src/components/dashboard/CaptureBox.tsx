@@ -10,6 +10,11 @@ export function CaptureBox() {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  function showToast(message: string, ms: number) {
+    setToast(message);
+    setTimeout(() => setToast(null), ms);
+  }
+
   async function submit() {
     const text = value.trim();
     if (!text || busy) return;
@@ -23,14 +28,15 @@ export function CaptureBox() {
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       setValue("");
-      setToast(`Saved → ${data.kind} (${String(data.urgency).replace("_", " ")})`);
+      // For a question the reply is the assistant's answer — keep it up longer.
+      const isAnswer = data.kind === "question";
+      showToast(data.reply || "Done.", isAnswer ? 9000 : 3500);
       window.dispatchEvent(new Event("personal-os-capture"));
     } catch (err) {
       console.error("[capture] failed:", err);
-      setToast("Capture failed — check the console.");
+      showToast("Capture failed — check the console.", 3500);
     } finally {
       setBusy(false);
-      setTimeout(() => setToast(null), 3000);
     }
   }
 

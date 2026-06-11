@@ -15,8 +15,9 @@ export async function sendMessage(
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
+        // Plain text (no parse_mode): replies now carry arbitrary AI-generated
+        // answers, and Markdown parsing would 400 on stray * or _ characters.
         text,
-        parse_mode: "Markdown",
         reply_markup: replyMarkup,
       }),
     });

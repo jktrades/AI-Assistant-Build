@@ -8,7 +8,7 @@ export const OPERATOR = {
   name: "Operator",
   location: "Earth",
   role: "Builder",
-  focus: "Shipping the Personal OS",
+  focus: "Shipping JK OS",
 };
 
 // Habit Tracker (Part 5.3) — six configurable daily habits.

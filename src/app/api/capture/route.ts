@@ -20,8 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       kind: result.classification.kind,
-      urgency: result.classification.urgency,
-      summary: result.classification.summary,
+      reply: result.reply,
       routed_to: result.routedTo,
     });
   } catch (err) {

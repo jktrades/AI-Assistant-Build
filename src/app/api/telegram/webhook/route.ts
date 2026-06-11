@@ -105,10 +105,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = await runCapturePipeline(text.trim(), "telegram", audioUrl);
-    const c = result.classification;
+    // result.reply is the answer for a question, or a confirmation otherwise.
+    // Only tasks get the urgency-override keyboard.
     await sendMessage(
       msg.chat.id,
-      `✅ *${c.kind}* · _${c.urgency.replace("_", " ")}_\n${c.summary}`,
+      result.reply,
       result.routedTo === "tasks" ? urgencyKeyboard(result.captureId) : undefined
     );
   } catch (err) {

@@ -34,7 +34,7 @@ export default function LoginPage() {
     <main className="min-h-screen grid place-items-center px-4">
       <form onSubmit={onSubmit} className="panel w-full max-w-sm p-8 space-y-5">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Personal OS</h1>
+          <h1 className="text-xl font-semibold tracking-tight">JK OS</h1>
           <p className="text-ink-3 text-sm mt-1">Enter your password to continue.</p>
         </div>
         <input
